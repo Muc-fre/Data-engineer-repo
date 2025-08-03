@@ -7,6 +7,7 @@ url = 'https://web.archive.org/web/20230902185655/https://en.everybodywiki.com/1
 db_name = 'Movies.db'
 table_name = 'Top_50'
 csv_path = 'top_50_films.csv'
+csv_path = '/home/project/Data-engineer-repo/webscraping_movies/top_50_films.csv'
 df = pd.DataFrame(columns=["Average Rank","Film","Year"])
 count = 0
 
@@ -23,6 +24,13 @@ for row in rows:
             data_dict = {"Average Rank": int(col[0].contents[0]),
                          "Film": str(col[1].contents[0]),
                          "Year": int(col[2].contents[0])}
+    if count<50:
+        col = row.find_all('td')
+        if len(col)!=0:
+            data_dict = {"Average Rank": col[0].contents[0],
+                         "Film": col[1].contents[0],
+                         "Year": col[2].contents[0]}
+
             df1 = pd.DataFrame(data_dict, index=[0])
             df = pd.concat([df,df1], ignore_index=True)
             count+=1
@@ -35,4 +43,5 @@ df.to_csv(csv_path)
 
 conn = sqlite3.connect(db_name)
 df.to_sql(table_name, conn, if_exists='replace', index=False)
+conn.close()
 conn.close()
